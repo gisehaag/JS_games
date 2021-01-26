@@ -1,6 +1,6 @@
 body {
 	font-family: 'Montserrat', sans-serif;
-	background-color: #333;
+	background-color: #464159;
 	margin: 0;
 }
 
@@ -10,7 +10,7 @@ body {
 }
 
 .text {
-	color: #f0f0f0;
+	color: #6c7b95;
 	text-align: center;
 	font-size: 14px;
 	margin: 0;
@@ -24,6 +24,67 @@ body {
 .box {
 	width: 60%;
 	margin: 15px auto 0;
+}
+
+.board {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	border: 5px solid #464159;
+}
+
+.cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 80px;
+	height: 120px;
+	/* background-color: #c7f0db; */
+	color: #8bbabb;
+}
+
+#a1,
+#a2,
+#a3,
+#b1,
+#b2,
+#b3 {
+	border-right: 5px solid #8bbabb;
+}
+
+#a1,
+#b1,
+#c1,
+#a2,
+#b2,
+#c2 {
+	border-bottom: 5px solid #8bbabb;
+}
+
+.message {
+	font-size: 2em;
+	font-weight: 600;
+	display: flex;
+	justify-content: center;
+}
+
+.reset.message {
+	font-size: 1em;
+	background-color: #95c3c4;
+	border: 2px solid #8bbabb;
+	border-radius: 6px;
+	margin: 0 auto;
+	color: #464159;
+	font-family: 'Montserrat';
+	padding: 5px 20px;
+}
+
+.reset.message:hover {
+	background-color: #464159;
+	color: #95c3c4;
+}
+
+.hidden {
+	display: none;
 }
 
 .footer {
