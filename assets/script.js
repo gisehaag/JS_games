@@ -6,39 +6,11 @@ class Game {
 		// this.config = Object.assign(configDefaults, config);
 		this.game = document.querySelector('.game');
 		this.giseTurn = false;
+		this.gameActive = true;
 
-		this.movesDone = [];
 		this.allCells = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'a3', 'b3', 'c3'];
 
-		this.myMoves = {
-			cell: [],
-			columns: {
-				"a": 0,
-				"b": 0,
-				"c": 0,
-			},
-			rows: {
-				"1": 0,
-				"2": 0,
-				"3": 0,
-			}
-		};
-
-		this.playerMoves = {
-			cell: [],
-			columns: {
-				"a": 0,
-				"b": 0,
-				"c": 0,
-
-			},
-			rows: {
-				"1": 0,
-				"2": 0,
-				"3": 0,
-			}
-		};
-
+		this.resetScores();
 		this.assignElements();
 		this.addEvents();
 	}
@@ -54,22 +26,26 @@ class Game {
 		this.cells.forEach((cell) => {
 			cell.addEventListener('click', this.round.bind(this));
 		})
+
+		this.resetButton.addEventListener('click', this.resetGame.bind(this));
 	}
 
 	round(e) {
-		let cell = e.currentTarget;
-		let lastMove = cell.dataset.cellId;
-		let lastColumn = lastMove[0];
-		let lastRow = lastMove[1];
+		if (this.gameActive) {
+			let cell = e.currentTarget;
+			let lastMove = cell.dataset.cellId;
+			let lastColumn = lastMove[0];
+			let lastRow = lastMove[1];
 
-		if (this.playerMoves.cell.includes(lastMove) || this.myMoves.cell.includes(lastMove)) {
-			alert('Ya jugaste ese casillero, elegí otro porfa 😏');
-			return;
+			if (this.playerMoves.cell.includes(lastMove) || this.myMoves.cell.includes(lastMove)) {
+				alert('Ya jugaste ese casillero, elegí otro porfa 😏');
+				return;
+			}
+
+			this.playerMove(lastMove, lastColumn, lastRow, cell);
+
+			if (this.giseTurn) this.giseMove(lastMove);
 		}
-
-		this.playerMove(lastMove, lastColumn, lastRow, cell);
-
-		if (this.giseTurn) this.giseMove(lastMove);
 	}
 
 
@@ -163,6 +139,49 @@ class Game {
 
 		this.message.innerHTML = winningMessage;
 		this.resetButton.classList.remove('hidden');
+		this.gameActive = false;
+	}
+
+	resetScores() {
+		this.movesDone = [];
+
+		this.myMoves = {
+			cell: [],
+			columns: {
+				"a": 0,
+				"b": 0,
+				"c": 0,
+			},
+			rows: {
+				"1": 0,
+				"2": 0,
+				"3": 0,
+			}
+		};
+
+		this.playerMoves = {
+			cell: [],
+			columns: {
+				"a": 0,
+				"b": 0,
+				"c": 0,
+
+			},
+			rows: {
+				"1": 0,
+				"2": 0,
+				"3": 0,
+			}
+		};
+	}
+
+	resetGame() {
+		this.message.innerHTML = '';
+		this.resetButton.classList.add('hidden');
+		this.gameActive = true;
+
+		this.resetBoard();
+		this.resetScores();
 	}
 }
 
