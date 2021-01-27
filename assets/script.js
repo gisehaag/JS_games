@@ -9,6 +9,8 @@ class Game {
 		this.gameActive = true;
 
 		this.allCells = ['a1', 'b1', 'c1', 'a2', 'b2', 'c2', 'a3', 'b3', 'c3'];
+		this.corners = ['a1', 'c1', 'a3', 'c3'];
+		this.center = 'b2';
 
 		this.resetScores();
 		this.assignElements();
@@ -44,7 +46,10 @@ class Game {
 
 			this.playerMove(lastMove, lastColumn, lastRow, cell);
 
-			if (this.giseTurn) this.giseMove(lastMove);
+			setTimeout(() => {
+				if (this.giseTurn) this.giseMove(lastMove);
+			}, 300)
+
 		}
 	}
 
@@ -55,12 +60,14 @@ class Game {
 
 		this.movesDone.push(lastMove);
 
+		if (!this.cornersUsed.includes(lastMove)) this.cornersUsed.push(lastMove);
+
 		this.playerMoves.cell.push(lastMove);
 		this.playerMoves.columns[lastColumn] += 1;
 		this.playerMoves.rows[lastRow] += 1;
 
 		if (this.playerMoves.cell.length >= 3) {
-			if (!this.isWinningCase()) {
+			if (!this.isWinningCase() && this.gameActive) {
 				this.giseTurn = true;
 			};
 		} else {
@@ -72,31 +79,104 @@ class Game {
 		this.giseTurn = true;
 		let posibleMove = [];
 		let myMove = '';
+		let opositeCorner = '';
 
-		if (!(lastMove == 'b2') && !(this.myMoves.cell.length > 0)) {
-			myMove = 'b2';
+		this.allCells.forEach((posibility) => {
+			if (!this.movesDone.includes(posibility)) {
+				posibleMove.push(posibility);
+			}
+		})
+
+		if (lastMove[0] == 'a') {
+			if (lastMove[1] == '1') {
+				opositeCorner = 'c3'
+			} else {
+				opositeCorner = 'c1'
+			}
 		} else {
-			this.allCells.forEach((posibility) => {
-				if (!this.movesDone.includes(posibility)) {
-					posibleMove.push(posibility);
-				}
-			})
+			if (lastMove[1] == '1') {
+				opositeCorner = 'a3'
+			} else {
+				opositeCorner = 'a1'
+			}
+		}
 
-			let positionPosibleMove = Math.round(Math.random() * (posibleMove.length - 1));
-			myMove = posibleMove[positionPosibleMove];
+		function filterCell(key) {
+			return posibleMove.filter((move) => { return move.indexOf(key) > -1 })
+		}
+
+		if (!myMove) {
+			if (!(lastMove == this.center) && !(this.myMoves.cell.length > 0)) {
+				if (!this.movesDone.includes(this.center)) {
+					myMove = this.center;
+				};
+			}
+		}
+
+		if (!myMove) {
+			if (this.cornersUsed.includes(lastMove)) {
+				if (!this.movesDone.includes(opositeCorner)) {
+					myMove = opositeCorner;
+				};
+			}
+		}
+
+		if (!myMove) {
+			for (let key in this.playerMoves.columns) {
+				if (this.playerMoves.columns[key] >= 2) {
+					if (!this.movesDone.includes(filterCell(key)[0])) {
+						myMove = filterCell(key)[0];
+					};
+				}
+			}
+		}
+
+		if (!myMove) {
+			for (let key in this.playerMoves.rows) {
+				if (this.playerMoves.rows[key] >= 2) {
+					if (!this.movesDone.includes(filterCell(key)[0])) {
+						myMove = filterCell(key)[0];
+					};
+				}
+			}
+		}
+
+		if (!myMove) {
+			for (let key in this.myMoves.columns) {
+				if (this.myMoves.columns[key] >= 2) {
+					if (!this.movesDone.includes(filterCell(key)[0])) {
+						console.log(myMove)
+						myMove = filterCell(key)[0];
+					};
+				}
+			}
+		}
+
+		if (!myMove) {
+			for (let key in this.myMoves.rows) {
+				if (this.myMoves.rows[key] >= 2) {
+					if (!this.movesDone.includes(filterCell(key)[0])) {
+						myMove = filterCell(key)[0];
+					};
+				}
+			}
+		}
+
+		if (!myMove) {
+			let myPosibleMove = Math.round(Math.random() * ((posibleMove.length) - 1));
+			myMove = posibleMove[myPosibleMove];
 		}
 
 		let cell = this.board.querySelector(`#${myMove}`);
 
 		cell.innerHTML = `<i class="icon-earth"></i>`;
+		if (this.myMoves.length >= 3) this.isWinningCase();
+
 		this.movesDone.push(myMove);
 
 		this.myMoves.cell.push(myMove);
-
 		this.myMoves.columns[cell.dataset.column] += 1;
 		this.myMoves.rows[cell.dataset.row] += 1;
-
-		if (this.myMoves.length >= 3) this.isWinningCase();
 	}
 
 	resetBoard() {
@@ -104,6 +184,12 @@ class Game {
 	}
 
 	isWinningCase() {
+		if (this.movesDone.length == 9) {
+			this.displayMessage();
+			this.message.innerHTML = 'Me diste pelea, pero qué hermoso empate! 😆';
+			return;
+		}
+
 		let winnerMoves = (this.giseTurn) ? this.myMoves : this.playerMoves;
 		let cell = winnerMoves.cell;
 		let columns = winnerMoves.columns;
@@ -144,9 +230,11 @@ class Game {
 
 	resetScores() {
 		this.movesDone = [];
+		this.cornersUsed = [];
 
 		this.myMoves = {
 			cell: [],
+			corners: [],
 			columns: {
 				"a": 0,
 				"b": 0,
@@ -156,7 +244,7 @@ class Game {
 				"1": 0,
 				"2": 0,
 				"3": 0,
-			}
+			},
 		};
 
 		this.playerMoves = {
@@ -184,7 +272,6 @@ class Game {
 		this.resetScores();
 	}
 }
-
 
 let game = new Game();
 
