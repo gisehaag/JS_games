@@ -20,6 +20,14 @@ body {
 .text.title {
 	font-size: 1.2em;
 }
+.text a {
+	color: #6c7b95;
+	text-decoration: none;
+}
+
+.text a:hover {
+	color: #fafafa;
+}
 
 .box {
 	width: 40%;
@@ -75,6 +83,7 @@ body {
 	color: #464159;
 	font-family: 'Montserrat';
 	padding: 5px 20px;
+	margin-bottom: 20px;
 }
 
 .reset.message:hover {
@@ -116,6 +125,6 @@ body {
 
 @media screen and (max-width: 768px) {
 	.box {
-		width: 100vw;
+		width: 90vw;
 	}
 }
