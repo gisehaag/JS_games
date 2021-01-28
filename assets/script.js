@@ -1,5 +1,5 @@
 class Game {
-	constructor(config) {
+	constructor() {
 		this.game = document.querySelector('.game');
 		this.giseTurn = false;
 		this.gameActive = true;
@@ -20,22 +20,14 @@ class Game {
 	}
 
 	opositeCorner() {
-		let opositeCorner = '';
-
-		if (this.lastMove[0] == 'a') {
-			if (this.lastMove[1] == '1') {
-				opositeCorner = 'c3'
-			} else {
-				opositeCorner = 'c1'
-			}
-		} else {
-			if (this.lastMove[1] == '1') {
-				opositeCorner = 'a3'
-			} else {
-				opositeCorner = 'a1'
-			}
+		let oposites = {
+			'a1': 'c3',
+			'a3': 'c1',
+			'c1': 'a3',
+			'c3': 'a1',
 		}
-		return opositeCorner;
+
+		return oposites[this.lastMove];
 	}
 
 	assignElements() {
@@ -96,7 +88,7 @@ class Game {
 
 	giseMove() {
 		this.giseTurn = true;
-		let myMove = this.defineMyMove(this.lastMove);
+		let myMove = this.defineMyMove();
 		let cell = this.board.querySelector(`#${myMove}`);
 
 		cell.innerHTML = `<i class="icon-earth"></i>`;
@@ -116,7 +108,6 @@ class Game {
 	defineMyMove() {
 		let posibleMove = [];
 		let myMove = '';
-		let opositeCorner = this.opositeCorner(this.lastMove);
 
 		this.allCells.forEach((posibility) => {
 			if (!this.movesDone.includes(posibility)) {
@@ -162,7 +153,6 @@ class Game {
 			}
 		}
 
-
 		if (!myMove) {
 			if (!(this.lastMove == this.center) && !(this.myMoves.cell.length > 0)) {
 				if (!this.movesDone.includes(this.center)) {
@@ -193,6 +183,8 @@ class Game {
 
 		if (!myMove) {
 			if (this.cornersUsed.includes(this.lastMove)) {
+				let opositeCorner = this.opositeCorner();
+
 				if (!this.movesDone.includes(opositeCorner) && this.movesDone.includes(this.center)) {
 					myMove = opositeCorner;
 				};
@@ -207,7 +199,6 @@ class Game {
 		return myMove;
 	}
 
-
 	resetBoard() {
 		this.cells.forEach((cell) => cell.innerHTML = ``);
 	}
@@ -220,9 +211,7 @@ class Game {
 		}
 
 		let winnerMoves = (this.giseTurn) ? this.myMoves : this.playerMoves;
-		let cell = winnerMoves.cell;
-		let columns = winnerMoves.columns;
-		let rows = winnerMoves.rows;
+		let { cell, columns, rows } = winnerMoves;
 
 		for (let key in columns) {
 			if (columns[key] == 3) {
@@ -238,19 +227,19 @@ class Game {
 			}
 		}
 
-		if (cell.includes('a1') && cell.includes('b2') && cell.includes('c3')) {
+		if (this.diagonalA1C3.every(i => cell.includes(i))) {
 			this.displayMessage();
 			return true;
 		}
 
-		if (cell.includes('c1') && cell.includes('b2') && cell.includes('a3')) {
+		if (this.diagonalA3C1.every(i => cell.includes(i))) {
 			this.displayMessage();
 			return true;
 		}
 	}
 
 	displayMessage() {
-		let winningMessage = !(this.giseTurn) ? 'Felicitaciones! Me ganaste!' : 'No te preocupes, te doy la revancha!';
+		let winningMessage = !(this.giseTurn) ? 'Felicitaciones! Me ganaste!' : 'No te preocupes, te doy la revancha! 😎';
 
 		this.message.innerHTML = winningMessage;
 		this.resetButton.classList.remove('hidden');
